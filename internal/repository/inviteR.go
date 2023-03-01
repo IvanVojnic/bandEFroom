@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/IvanVojnic/bandEFroom/models"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -74,4 +75,15 @@ func (r *RoomPostgres) DeclineInvite(ctx context.Context, userID uuid.UUID, room
 		return fmt.Errorf("accpet invite error %w", err)
 	}
 	return nil
+}
+
+// CreateRoom used to create room
+func (r *RoomPostgres) CreateRoom(ctx context.Context, userID uuid.UUID, place string, date time.Time) (uuid.UUID, error) {
+	roomID := uuid.New()
+	_, errRoom := r.db.Exec(ctx, "insert into rooms (id, idUserCreator, place, date) values($1, $2, $3, $4)",
+		roomID, userID, place, date)
+	if errRoom != nil {
+		return uuid.UUID{}, fmt.Errorf("error while room creating: %s", errRoom)
+	}
+	return roomID, nil
 }

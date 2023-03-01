@@ -11,7 +11,7 @@ import (
 )
 
 type Room interface {
-	GetRooms(ctx context.Context, user uuid.UUID) ([]models.Room, error)
+	GetRooms(ctx context.Context, user uuid.UUID) ([]models.RoomResponse, error)
 }
 
 type RoomServer struct {

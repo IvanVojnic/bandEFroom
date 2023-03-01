@@ -3,8 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"time"
-
+	"github.com/IvanVojnic/bandEFroom/models"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -19,19 +18,8 @@ func NewRoomPostgres(db *pgxpool.Pool) *RoomPostgres {
 	return &RoomPostgres{db: db}
 }
 
-// CreateRoom used to create room
-func (r *RoomPostgres) CreateRoom(ctx context.Context, userID uuid.UUID, place string, date time.Time) (uuid.UUID, error) {
-	roomID := uuid.New()
-	_, errRoom := r.db.Exec(ctx, "insert into rooms (id, idUserCreator, place, date) values($1, $2, $3, $4)",
-		roomID, userID, place, date)
-	if errRoom != nil {
-		return uuid.UUID{}, fmt.Errorf("error while room creating: %s", errRoom)
-	}
-	return roomID, nil
-}
-
 // GetRooms used to get rooms where you had invited
-/*func (r *RoomPostgres) GetRooms(ctx context.Context, userID uuid.UUID) ([]models.Room, error) {
+func (r *RoomPostgres) GetRooms(ctx context.Context, userID uuid.UUID) ([]models.Room, error) {
 	var rooms []models.Room
 	rowsUserRooms, errUserRooms := r.db.Query(ctx,
 		`SELECT ROOMS.id, ROOMS.room_idUserCreator, ROOMS.room_place, ROOMS.room_date, USERS.email, STATUSES.status FROM ROOMS
@@ -71,4 +59,4 @@ func (r *RoomPostgres) CreateRoom(ctx context.Context, userID uuid.UUID, place s
 		rooms[i].Users = users
 	}
 	return rooms, nil
-}*/
+}
