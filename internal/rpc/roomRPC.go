@@ -23,29 +23,22 @@ func NewRoomServer(roomServ Room) *RoomServer {
 	return &RoomServer{roomServ: roomServ}
 }
 
-func (s *RoomServer) DeclineInvite(ctx context.Context, req *pr.DeclineInviteRequest) (*pr.DeclineInviteResponse, error) {
+func (s *RoomServer) GetRooms(ctx context.Context, req *pr.GetRoomsRequest) (*pr.GetRoomsResponse, error) {
 	userID, errUserParse := uuid.Parse(req.GetUserID())
 	if errUserParse != nil {
 		logrus.WithFields(logrus.Fields{
 			"Error parse user ID": errUserParse,
 			"userID":              userID,
 		}).Errorf("error parsing ID, %s", errUserParse)
-		return &pr.DeclineInviteResponse{}, fmt.Errorf("error while parsing ID, %s", errUserParse)
+		return &pr.GetRoomsResponse{}, fmt.Errorf("error while parsing ID, %s", errUserParse)
 	}
-	roomID, errRoomParse := uuid.Parse(req.GetRoomID())
-	if errRoomParse != nil {
+	rooms, errGetRooms := s.roomServ.GetRooms(ctx, userID)
+	if errGetRooms != nil {
 		logrus.WithFields(logrus.Fields{
-			"Error parse room ID": errRoomParse,
-			"roomID":              roomID,
-		}).Errorf("error parsing ID, %s", errRoomParse)
-		return &pr.DeclineInviteResponse{}, fmt.Errorf("error while parsing ID, %s", errRoomParse)
+			"Error decline invite": errGetRooms,
+			"rooms":                rooms,
+		}).Errorf("error decline invite, %s", errGetRooms)
+		return &pr.GetRoomsResponse{}, fmt.Errorf("error while decling invite, %s", errGetRooms)
 	}
-	errDecline := s.inviteServ.AcceptInvite(ctx, userID, roomID, int(req.GetStatusID()))
-	if errDecline != nil {
-		logrus.WithFields(logrus.Fields{
-			"Error decline invite": errDecline,
-		}).Errorf("error decline invite, %s", errDecline)
-		return &pr.DeclineInviteResponse{}, fmt.Errorf("error while decling invite, %s", errDecline)
-	}
-	return &pr.DeclineInviteResponse{}, nil
+	return &pr.GetRoomsResponse{}, nil
 }
