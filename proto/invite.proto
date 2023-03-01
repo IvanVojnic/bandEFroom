@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+option go_package = "github.com/IvanVojnic/bandEFroom/proto";
+
+package room;
+
+service room {
+  rpc SendInvite(SendInviteRequest) returns (SendInviteResponse){}
+  rpc AcceptInvite(AcceptInviteRequest) returns (AcceptInviteResponse){}
+  rpc DeclineInvite(DeclineInviteRequest) returns (DeclineInviteResponse){}
+}
+
+message SendInviteRequest {
+  string userCreatorID = 1;
+  repeated User friends = 2;
+  string place = 3;
+  string date = 4;
+}
+
+message SendInviteResponse {
+
+}
+
+message AcceptInviteRequest {
+  string userID = 1;
+  string roomID = 2;
+  int32 statusID = 3;
+}
+
+message AcceptInviteResponse {
+
+}
+
+message DeclineInviteRequest {
+  string userID = 1;
+  string roomID = 2;
+  int32 statusID = 3;
+}
+
+message DeclineInviteResponse {
+
+}
+
+message User {
+  string ID = 1;
+  string name = 2;
+  string email = 3;
+}
