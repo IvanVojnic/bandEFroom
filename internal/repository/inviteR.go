@@ -51,14 +51,27 @@ func (r *RoomPostgres) SendInvite(ctx context.Context, users []models.User, room
 }
 
 // AcceptInvite used to accept invite to the room
-func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID, statusID int) error {
+func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID, status int) error {
 	_, err := r.db.Exec(ctx,
 		`UPDATE invites 
-			SET status_id=$1 
+			SET status=$1 
 			WHERE invites.user_id=$2 AND invites.room_id=$3`,
-		1, userID, roomID)
+		status, userID, roomID)
 	if err != nil {
-		return fmt.Errorf("update friends error %w", err)
+		return fmt.Errorf("accpet invite error %w", err)
+	}
+	return nil
+}
+
+// DeclineInvite used to accept invite to the room
+func (r *RoomPostgres) DeclineInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID, status int) error {
+	_, err := r.db.Exec(ctx,
+		`UPDATE invites 
+			SET status=$1 
+			WHERE invites.user_id=$2 AND invites.room_id=$3`,
+		status, userID, roomID)
+	if err != nil {
+		return fmt.Errorf("accpet invite error %w", err)
 	}
 	return nil
 }
