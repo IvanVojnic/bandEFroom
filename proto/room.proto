@@ -6,6 +6,7 @@ package room;
 
 service room {
   rpc GetRooms(GetRoomsRequest) returns (GetRoomsResponse){}
+  rpc GetUsersRoom(GetUsersRoomRequest) returns (GetUsersRoomResponse){}
 }
 
 message GetRoomsRequest {
@@ -17,10 +18,18 @@ message GetRoomsResponse {
 }
 
 message Room {
-  string userCreatorId = 1;
-  string date = 2;
-  string place = 3;
-  repeated User users = 4;
+  string roomID = 1;
+  string userCreatorId = 2;
+  string date = 3;
+  string place = 4;
+}
+
+message GetUsersRoomRequest{
+  string roomID = 1;
+}
+
+message GetUsersRoomResponse{
+  repeated User users = 1;
 }
 
 message User {

@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RoomClient interface {
 	GetRooms(ctx context.Context, in *GetRoomsRequest, opts ...grpc.CallOption) (*GetRoomsResponse, error)
+	GetUsersRoom(ctx context.Context, in *GetUsersRoomRequest, opts ...grpc.CallOption) (*GetUsersRoomResponse, error)
 }
 
 type roomClient struct {
@@ -42,11 +43,21 @@ func (c *roomClient) GetRooms(ctx context.Context, in *GetRoomsRequest, opts ...
 	return out, nil
 }
 
+func (c *roomClient) GetUsersRoom(ctx context.Context, in *GetUsersRoomRequest, opts ...grpc.CallOption) (*GetUsersRoomResponse, error) {
+	out := new(GetUsersRoomResponse)
+	err := c.cc.Invoke(ctx, "/room.room/GetUsersRoom", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RoomServer is the server API for Room service.
 // All implementations must embed UnimplementedRoomServer
 // for forward compatibility
 type RoomServer interface {
 	GetRooms(context.Context, *GetRoomsRequest) (*GetRoomsResponse, error)
+	GetUsersRoom(context.Context, *GetUsersRoomRequest) (*GetUsersRoomResponse, error)
 	mustEmbedUnimplementedRoomServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedRoomServer struct {
 
 func (UnimplementedRoomServer) GetRooms(context.Context, *GetRoomsRequest) (*GetRoomsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetRooms not implemented")
+}
+func (UnimplementedRoomServer) GetUsersRoom(context.Context, *GetUsersRoomRequest) (*GetUsersRoomResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUsersRoom not implemented")
 }
 func (UnimplementedRoomServer) mustEmbedUnimplementedRoomServer() {}
 
@@ -88,6 +102,24 @@ func _Room_GetRooms_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Room_GetUsersRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUsersRoomRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RoomServer).GetUsersRoom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/room.room/GetUsersRoom",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RoomServer).GetUsersRoom(ctx, req.(*GetUsersRoomRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Room_ServiceDesc is the grpc.ServiceDesc for Room service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var Room_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetRooms",
 			Handler:    _Room_GetRooms_Handler,
+		},
+		{
+			MethodName: "GetUsersRoom",
+			Handler:    _Room_GetUsersRoom_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
