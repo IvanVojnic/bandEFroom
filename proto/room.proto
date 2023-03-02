@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option go_package = "github.com/IvanVojnic/bandEFroom/proto";
+
+package room;
+
+service room {
+  rpc GetRooms(GetRoomsRequest) returns (GetRoomsResponse){}
+  rpc GetUsersRoom(GetUsersRoomRequest) returns (GetUsersRoomResponse){}
+}
+
+message GetRoomsRequest {
+  string userID = 1;
+}
+
+message GetRoomsResponse {
+  repeated Room rooms = 1;
+}
+
+message Room {
+  string roomID = 1;
+  string userCreatorId = 2;
+  string date = 3;
+  string place = 4;
+}
+
+message GetUsersRoomRequest{
+  string roomID = 1;
+}
+
+message GetUsersRoomResponse{
+  repeated User users = 1;
+}
+
+message User {
+  string ID = 1;
+  string name = 2;
+  string email = 3;
+}

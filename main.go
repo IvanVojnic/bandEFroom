@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/IvanVojnic/bandEFroom/internal/service"
 	"net"
 
 	"github.com/IvanVojnic/bandEFroom/internal/config"
@@ -31,14 +32,14 @@ func main() {
 	}
 	defer repository.ClosePool(db)
 	inviteRepo := repository.NewRoomPostgres(db)
-	//userCommRepo := repository.NewUserCommPostgres(db)
-	inviteServ := service.NewUserAuthServer(inviteRepo)
-	//userCommServ := service.NewUserCommServer(userCommRepo)
+	roomRepo := repository.NewRoomPostgres(db)
+	inviteServ := service.NewInviteServer(inviteRepo)
+	roomServ := service.NewRoomServer(roomRepo)
 	inviteGRPC := rpc.NewInviteServer(inviteServ)
-	//userCommGRPC := rpc.NewUserCommServer(userCommServ)
+	roomGRPC := rpc.NewRoomServer(roomServ)
 
-	//pr.RegisterUserServer(s, userAuthGRPC)
 	pr.RegisterRoomServer(s, inviteGRPC)
+	pr.RegisterRoomServer(s, roomGRPC)
 	listen, err := net.Listen("tcp", ":8000")
 	if err != nil {
 		defer logrus.Fatalf("error while listening port: %e", err)
