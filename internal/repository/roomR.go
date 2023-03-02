@@ -11,12 +11,13 @@ import (
 
 // RoomPostgres is a wrapper to db object
 type RoomPostgres struct {
-	db *pgxpool.Pool
+	db     *pgxpool.Pool
+	client pr.UserCommClient
 }
 
 // NewRoomPostgres used to init RoomPostgres
-func NewRoomPostgres(db *pgxpool.Pool) *RoomPostgres {
-	return &RoomPostgres{db: db}
+func NewRoomPostgres(db *pgxpool.Pool, client pr.UserCommClient) *RoomPostgres {
+	return &RoomPostgres{db: db, client: client}
 }
 
 // GetRooms used to get rooms where you had invited
@@ -43,7 +44,7 @@ func (r *RoomPostgres) GetRooms(ctx context.Context, userID uuid.UUID) ([]models
 func (r *RoomPostgres) GetUsersRoom(ctx context.Context, roomID uuid.UUID) ([]uuid.UUID, error) {
 	var usersID []uuid.UUID
 	rowsUserInvites, errUserInvites := r.db.Query(ctx,
-		`SELECT INVITES.id, INVITES.user_id FROM INVITES
+		`SELECT INVITES.user_id FROM INVITES
 			 WHERE INVITES.room_id=$1`, roomID)
 	if errUserInvites != nil {
 		return usersID, fmt.Errorf("error while getting invites")
@@ -51,7 +52,7 @@ func (r *RoomPostgres) GetUsersRoom(ctx context.Context, roomID uuid.UUID) ([]uu
 	defer rowsUserInvites.Close()
 	for rowsUserInvites.Next() {
 		var userID uuid.UUID
-		errScan := rowsUserInvites.Scan()
+		errScan := rowsUserInvites.Scan(&userID)
 		if errScan != nil {
 			return usersID, fmt.Errorf("get all friends requests scan rows error %w", errScan)
 		}
@@ -66,12 +67,16 @@ func (r *RoomPostgres) GetUsers(ctx context.Context, usersID []uuid.UUID) ([]mod
 	for _, ID := range usersID {
 		usersIDStr = append(usersIDStr, ID.String())
 	}
-	res, errGRPC := r.client.GetRooms(ctx, &pr.GetRoomsRequest{UsersID: usersIDStr})
+	res, errGRPC := r.client.GetUsers(ctx, &pr.GetUsersRequest{UsersID: usersIDStr})
 	if errGRPC != nil {
 		return users, fmt.Errorf("error while sign up, %s", errGRPC)
 	}
 	for _, user := range res.Users {
-		users = append(users, models.User{ID: user.ID, Name: user.Name, Email: user.Email})
+		userID, errUserID := uuid.Parse(user.ID)
+		if errUserID != nil {
+			return users, fmt.Errorf("error while parsing room ID, %s", errUserID)
+		}
+		users = append(users, models.User{ID: userID, Name: user.Name, Email: user.Email})
 	}
 	return users, nil
 }

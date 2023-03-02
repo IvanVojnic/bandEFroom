@@ -3,7 +3,7 @@ module github.com/IvanVojnic/bandEFroom
 go 1.19
 
 require (
-	github.com/IvanVojnic/bandEFuser v1.0.2
+	github.com/IvanVojnic/bandEFuser v1.0.3
 	github.com/caarlos0/env/v7 v7.0.0
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v5 v5.3.1
