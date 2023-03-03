@@ -61,5 +61,9 @@ func (s *RoomServer) GetUsersRoom(ctx context.Context, req *pr.GetUsersRoomReque
 		}).Errorf("error get users from room, %s", errGetUsers)
 		return &pr.GetUsersRoomResponse{}, fmt.Errorf("error while getting users from room, %s", errGetUsers)
 	}
-	return &pr.GetUsersRoomResponse{}, nil
+	var usersGRPC []*pr.User
+	for _, user := range users {
+		usersGRPC = append(usersGRPC, &pr.User{ID: user.ID.String(), Name: user.Name, Email: user.Email})
+	}
+	return &pr.GetUsersRoomResponse{Users: usersGRPC}, nil
 }
