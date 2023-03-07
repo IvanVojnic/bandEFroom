@@ -15,14 +15,14 @@ import (
 
 // Invite is an interface with implemented methods from Invite service
 type Invite interface {
-	SendInvite(ctx context.Context, userCreatorID uuid.UUID, users *[]models.User, place string, date time.Time) error
+	SendInvite(ctx context.Context, userCreatorID uuid.UUID, users []*models.User, place string, date time.Time) error
 	AcceptInvite(ctx context.Context, userID, roomID uuid.UUID) error
 	DeclineInvite(ctx context.Context, userID, roomID uuid.UUID) error
 }
 
 // InviteServer used to define invite server obj
 type InviteServer struct {
-	pr.UnimplementedRoomServer
+	pr.UnimplementedInviteServer
 	inviteServ Invite
 }
 
@@ -43,7 +43,7 @@ func (s *InviteServer) SendInvite(ctx context.Context, req *pr.SendInviteRequest
 		}).Errorf("error parsing ID (send invite), %s", errParse)
 		return &pr.SendInviteResponse{}, fmt.Errorf("error while parsing ID, %s", errParse)
 	}
-	users := make([]models.User, len(req.GetUsersID()))
+	users := make([]*models.User, len(req.GetUsersID()))
 	for _, userGRPC := range req.GetUsersID() {
 		userID, errParseID := uuid.Parse(userGRPC)
 		if errParseID != nil {
@@ -54,7 +54,7 @@ func (s *InviteServer) SendInvite(ctx context.Context, req *pr.SendInviteRequest
 			return &pr.SendInviteResponse{}, fmt.Errorf("error while parsing ID, %s", errParseID)
 		}
 		user := models.User{ID: userID}
-		users = append(users, user)
+		users = append(users, &user)
 	}
 	date, errDateParse := time.Parse(timeLayout, req.GetDate())
 	if errDateParse != nil {
@@ -63,7 +63,7 @@ func (s *InviteServer) SendInvite(ctx context.Context, req *pr.SendInviteRequest
 		}).Errorf("error parsing date (send invite), %s", errDateParse)
 		return &pr.SendInviteResponse{}, fmt.Errorf("error while parsing date, %s", errDateParse)
 	}
-	errSend := s.inviteServ.SendInvite(ctx, userCreatorID, &users, req.GetPlace(), date)
+	errSend := s.inviteServ.SendInvite(ctx, userCreatorID, users, req.GetPlace(), date)
 	if errSend != nil {
 		logrus.Errorf("error sending invite, %s", errSend)
 		return &pr.SendInviteResponse{}, fmt.Errorf("error while seding invite, %s", errSend)

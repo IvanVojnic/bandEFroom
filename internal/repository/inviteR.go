@@ -36,28 +36,25 @@ func NewInvitePostgres(db *pgxpool.Pool) *InvitePostgres {
 }
 
 // SendInvite used to send request to be a friends
-func (r *RoomPostgres) SendInvite(ctx context.Context, users *[]models.User, roomID, creatorID uuid.UUID) error {
+func (r *InvitePostgres) SendInvite(ctx context.Context, users []*models.User, roomID, creatorID uuid.UUID) error {
 	batch := &pgx.Batch{}
-	for _, user := range *users {
-		inviteID := uuid.New()
+	var inviteID uuid.UUID
+	for _, user := range users {
+		inviteID = uuid.New()
 		batch.Queue("INSERT INTO invites (id, user_id, room_id, status) VALUES($1, $2, $3, $4)", inviteID, user.ID, roomID, NoAnswer)
 	}
+	inviteID = uuid.New()
+	batch.Queue("INSERT INTO invites (id, user_id, room_id, status) VALUES($1, $2, $3, $4)", inviteID, creatorID, roomID, Accept)
 	res := r.db.SendBatch(ctx, batch)
 	err := res.Close()
 	if err != nil {
 		return fmt.Errorf("error while inserting into invites: %s", err)
 	}
-	inviteID := uuid.New()
-	_, errInvite := r.db.Exec(ctx, "insert into invites (id, user_id, room_id, status) values($1, $2, $3, $4)",
-		inviteID, creatorID, roomID, Accept)
-	if errInvite != nil {
-		return fmt.Errorf("error while invite creating: %s", errInvite)
-	}
 	return nil
 }
 
 // AcceptInvite used to accept invite to the room
-func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID, roomID uuid.UUID) error {
+func (r *InvitePostgres) AcceptInvite(ctx context.Context, userID, roomID uuid.UUID) error {
 	_, err := r.db.Exec(ctx,
 		`UPDATE invites 
 			SET status=$1 
@@ -70,7 +67,7 @@ func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID, roomID uuid.UUI
 }
 
 // DeclineInvite used to accept invite to the room
-func (r *RoomPostgres) DeclineInvite(ctx context.Context, userID, roomID uuid.UUID) error {
+func (r *InvitePostgres) DeclineInvite(ctx context.Context, userID, roomID uuid.UUID) error {
 	_, err := r.db.Exec(ctx,
 		`UPDATE invites 
 			SET status=$1 
@@ -83,9 +80,9 @@ func (r *RoomPostgres) DeclineInvite(ctx context.Context, userID, roomID uuid.UU
 }
 
 // CreateRoom used to create room
-func (r *RoomPostgres) CreateRoom(ctx context.Context, userID uuid.UUID, place string, date time.Time) (uuid.UUID, error) {
+func (r *InvitePostgres) CreateRoom(ctx context.Context, userID uuid.UUID, place string, date time.Time) (uuid.UUID, error) {
 	roomID := uuid.New()
-	_, errRoom := r.db.Exec(ctx, "insert into rooms (id, idUserCreator, place, date) values($1, $2, $3, $4)",
+	_, errRoom := r.db.Exec(ctx, "INSERT INTO rooms (id, idUserCreator, place, date) VALUES($1, $2, $3, $4)",
 		roomID, userID, place, date)
 	if errRoom != nil {
 		return uuid.UUID{}, fmt.Errorf("error while room creating: %s", errRoom)

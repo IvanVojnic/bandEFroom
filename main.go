@@ -30,9 +30,7 @@ func main() {
 	}
 	db, err := repository.NewPostgresDB(cfg)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"Error connection to database rep.NewPostgresDB()": err,
-		}).Fatal("DB ERROR CONNECTION")
+		logrus.Fatalf("DB ERROR CONNECTION %s", err)
 	}
 	defer repository.ClosePool(db)
 
@@ -42,7 +40,7 @@ func main() {
 	}
 	clientUserComm := prUser.NewUserCommClient(connUserMS)
 
-	inviteRepo := repository.NewRoomPostgres(db, clientUserComm)
+	inviteRepo := repository.NewInvitePostgres(db)
 	roomRepo := repository.NewRoomPostgres(db, clientUserComm)
 
 	inviteServ := service.NewInviteServer(inviteRepo)
@@ -51,13 +49,13 @@ func main() {
 	inviteGRPC := rpc.NewInviteServer(inviteServ)
 	roomGRPC := rpc.NewRoomServer(roomServ)
 
-	pr.RegisterRoomServer(s, inviteGRPC)
+	pr.RegisterInviteServer(s, inviteGRPC)
 	pr.RegisterRoomServer(s, roomGRPC)
 	listen, err := net.Listen("tcp", "1.2.3.4:8000") // ???????????? ???????????? ????????????
 	if err != nil {
-		defer logrus.Fatalf("error while listening port: %e", err)
+		defer logrus.Errorf("error while listening port: %e", err)
 	}
 	if errServ := s.Serve(listen); errServ != nil {
-		defer logrus.Fatalf("error while listening server: %e", err)
+		defer logrus.Errorf("error while listening server: %e", err)
 	}
 }

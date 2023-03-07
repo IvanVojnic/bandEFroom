@@ -14,8 +14,8 @@ import (
 
 // Room is an interface with implemented methods from room service
 type Room interface {
-	GetRooms(ctx context.Context, user uuid.UUID) (*[]models.Room, error)
-	GetRoomsUser(ctx context.Context, roomID uuid.UUID) (*[]models.User, error)
+	GetRooms(ctx context.Context, user uuid.UUID) ([]*models.Room, error)
+	GetRoomsUser(ctx context.Context, roomID uuid.UUID) ([]*models.User, error)
 }
 
 // RoomServer used to define room server obj
@@ -65,7 +65,7 @@ func (s *RoomServer) GetUsersRoom(ctx context.Context, req *pr.GetUsersRoomReque
 		return &pr.GetUsersRoomResponse{}, fmt.Errorf("error while getting users from room, %s", errGetUsers)
 	}
 	usersGRPC := make([]*pr.User, 0)
-	for _, user := range *users {
+	for _, user := range users {
 		usersGRPC = append(usersGRPC, &pr.User{ID: user.ID.String(), Name: user.Name, Email: user.Email})
 	}
 	return &pr.GetUsersRoomResponse{Users: usersGRPC}, nil
