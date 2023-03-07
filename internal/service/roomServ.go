@@ -24,15 +24,15 @@ func NewRoomServer(roomRepo Room) *RoomServer {
 
 // GetRooms used to get rooms by repo
 func (s *RoomServer) GetRooms(ctx context.Context, userID uuid.UUID) ([]models.Room, error) {
-	return s.roomRepo.GetRooms(ctx, userID)
+	return s.roomRepo.GetRooms(ctx, userID) // get all user rooms
 }
 
 func (s *RoomServer) GetUsersRoom(ctx context.Context, roomID uuid.UUID) ([]models.User, error) {
-	usersID, errUsersID := s.roomRepo.GetUsersRoom(ctx, roomID)
+	usersID, errUsersID := s.roomRepo.GetUsersRoom(ctx, roomID) // get array of users id who are in current room
 	if errUsersID != nil {
 		return nil, errUsersID
 	}
-	users, err := s.roomRepo.GetUsers(ctx, usersID)
+	users, err := s.roomRepo.GetUsers(ctx, usersID) // get all users by they id from userMS
 	if err != nil {
 		return nil, err
 	}

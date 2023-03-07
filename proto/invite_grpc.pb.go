@@ -18,158 +18,158 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// RoomClient is the client API for Room service.
+// InviteClient is the client API for Invite service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type RoomClient interface {
+type InviteClient interface {
 	SendInvite(ctx context.Context, in *SendInviteRequest, opts ...grpc.CallOption) (*SendInviteResponse, error)
 	AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*AcceptInviteResponse, error)
 	DeclineInvite(ctx context.Context, in *DeclineInviteRequest, opts ...grpc.CallOption) (*DeclineInviteResponse, error)
 }
 
-type roomClient struct {
+type inviteClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewRoomClient(cc grpc.ClientConnInterface) RoomClient {
-	return &roomClient{cc}
+func NewInviteClient(cc grpc.ClientConnInterface) InviteClient {
+	return &inviteClient{cc}
 }
 
-func (c *roomClient) SendInvite(ctx context.Context, in *SendInviteRequest, opts ...grpc.CallOption) (*SendInviteResponse, error) {
+func (c *inviteClient) SendInvite(ctx context.Context, in *SendInviteRequest, opts ...grpc.CallOption) (*SendInviteResponse, error) {
 	out := new(SendInviteResponse)
-	err := c.cc.Invoke(ctx, "/room.room/SendInvite", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/room.invite/SendInvite", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *roomClient) AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*AcceptInviteResponse, error) {
+func (c *inviteClient) AcceptInvite(ctx context.Context, in *AcceptInviteRequest, opts ...grpc.CallOption) (*AcceptInviteResponse, error) {
 	out := new(AcceptInviteResponse)
-	err := c.cc.Invoke(ctx, "/room.room/AcceptInvite", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/room.invite/AcceptInvite", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *roomClient) DeclineInvite(ctx context.Context, in *DeclineInviteRequest, opts ...grpc.CallOption) (*DeclineInviteResponse, error) {
+func (c *inviteClient) DeclineInvite(ctx context.Context, in *DeclineInviteRequest, opts ...grpc.CallOption) (*DeclineInviteResponse, error) {
 	out := new(DeclineInviteResponse)
-	err := c.cc.Invoke(ctx, "/room.room/DeclineInvite", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/room.invite/DeclineInvite", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// RoomServer is the server API for Room service.
-// All implementations must embed UnimplementedRoomServer
+// InviteServer is the server API for Invite service.
+// All implementations must embed UnimplementedInviteServer
 // for forward compatibility
-type RoomServer interface {
+type InviteServer interface {
 	SendInvite(context.Context, *SendInviteRequest) (*SendInviteResponse, error)
 	AcceptInvite(context.Context, *AcceptInviteRequest) (*AcceptInviteResponse, error)
 	DeclineInvite(context.Context, *DeclineInviteRequest) (*DeclineInviteResponse, error)
-	mustEmbedUnimplementedRoomServer()
+	mustEmbedUnimplementedInviteServer()
 }
 
-// UnimplementedRoomServer must be embedded to have forward compatible implementations.
-type UnimplementedRoomServer struct {
+// UnimplementedInviteServer must be embedded to have forward compatible implementations.
+type UnimplementedInviteServer struct {
 }
 
-func (UnimplementedRoomServer) SendInvite(context.Context, *SendInviteRequest) (*SendInviteResponse, error) {
+func (UnimplementedInviteServer) SendInvite(context.Context, *SendInviteRequest) (*SendInviteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendInvite not implemented")
 }
-func (UnimplementedRoomServer) AcceptInvite(context.Context, *AcceptInviteRequest) (*AcceptInviteResponse, error) {
+func (UnimplementedInviteServer) AcceptInvite(context.Context, *AcceptInviteRequest) (*AcceptInviteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AcceptInvite not implemented")
 }
-func (UnimplementedRoomServer) DeclineInvite(context.Context, *DeclineInviteRequest) (*DeclineInviteResponse, error) {
+func (UnimplementedInviteServer) DeclineInvite(context.Context, *DeclineInviteRequest) (*DeclineInviteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeclineInvite not implemented")
 }
-func (UnimplementedRoomServer) mustEmbedUnimplementedRoomServer() {}
+func (UnimplementedInviteServer) mustEmbedUnimplementedInviteServer() {}
 
-// UnsafeRoomServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to RoomServer will
+// UnsafeInviteServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to InviteServer will
 // result in compilation errors.
-type UnsafeRoomServer interface {
-	mustEmbedUnimplementedRoomServer()
+type UnsafeInviteServer interface {
+	mustEmbedUnimplementedInviteServer()
 }
 
-func RegisterRoomServer(s grpc.ServiceRegistrar, srv RoomServer) {
-	s.RegisterService(&Room_ServiceDesc, srv)
+func RegisterInviteServer(s grpc.ServiceRegistrar, srv InviteServer) {
+	s.RegisterService(&Invite_ServiceDesc, srv)
 }
 
-func _Room_SendInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Invite_SendInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SendInviteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoomServer).SendInvite(ctx, in)
+		return srv.(InviteServer).SendInvite(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/room.room/SendInvite",
+		FullMethod: "/room.invite/SendInvite",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoomServer).SendInvite(ctx, req.(*SendInviteRequest))
+		return srv.(InviteServer).SendInvite(ctx, req.(*SendInviteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Room_AcceptInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Invite_AcceptInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AcceptInviteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoomServer).AcceptInvite(ctx, in)
+		return srv.(InviteServer).AcceptInvite(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/room.room/AcceptInvite",
+		FullMethod: "/room.invite/AcceptInvite",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoomServer).AcceptInvite(ctx, req.(*AcceptInviteRequest))
+		return srv.(InviteServer).AcceptInvite(ctx, req.(*AcceptInviteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Room_DeclineInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Invite_DeclineInvite_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeclineInviteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoomServer).DeclineInvite(ctx, in)
+		return srv.(InviteServer).DeclineInvite(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/room.room/DeclineInvite",
+		FullMethod: "/room.invite/DeclineInvite",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoomServer).DeclineInvite(ctx, req.(*DeclineInviteRequest))
+		return srv.(InviteServer).DeclineInvite(ctx, req.(*DeclineInviteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Room_ServiceDesc is the grpc.ServiceDesc for Room service.
+// Invite_ServiceDesc is the grpc.ServiceDesc for Invite service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Room_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "room.room",
-	HandlerType: (*RoomServer)(nil),
+var Invite_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "room.invite",
+	HandlerType: (*InviteServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "SendInvite",
-			Handler:    _Room_SendInvite_Handler,
+			Handler:    _Invite_SendInvite_Handler,
 		},
 		{
 			MethodName: "AcceptInvite",
-			Handler:    _Room_AcceptInvite_Handler,
+			Handler:    _Invite_AcceptInvite_Handler,
 		},
 		{
 			MethodName: "DeclineInvite",
-			Handler:    _Room_DeclineInvite_Handler,
+			Handler:    _Invite_DeclineInvite_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
