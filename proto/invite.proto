@@ -12,7 +12,7 @@ service invite {
 
 message SendInviteRequest {
   string userCreatorID = 1;
-  repeated User friends = 2;
+  repeated string usersID = 2;
   string place = 3;
   string date = 4;
 }
@@ -39,10 +39,4 @@ message DeclineInviteRequest {
 
 message DeclineInviteResponse {
 
-}
-
-message User {
-  string ID = 1;
-  string name = 2;
-  string email = 3;
 }
