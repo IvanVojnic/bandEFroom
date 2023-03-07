@@ -1,11 +1,15 @@
+// Package service define room services methods
 package service
 
 import (
 	"context"
+
 	"github.com/IvanVojnic/bandEFroom/models"
+
 	"github.com/google/uuid"
 )
 
+// Room interface define implemented methods
 type Room interface {
 	GetRooms(ctx context.Context, user uuid.UUID) (*[]models.Room, error)
 	GetRoomUsers(ctx context.Context, roomID uuid.UUID) (*[]uuid.UUID, error)
@@ -27,6 +31,7 @@ func (s *RoomServer) GetRooms(ctx context.Context, userID uuid.UUID) (*[]models.
 	return s.roomRepo.GetRooms(ctx, userID) // get all user rooms
 }
 
+// GetRoomsUser used get users of current room
 func (s *RoomServer) GetRoomsUser(ctx context.Context, roomID uuid.UUID) (*[]models.User, error) {
 	usersID, errUsersID := s.roomRepo.GetRoomUsers(ctx, roomID) // get array of users id who are in current room
 	if errUsersID != nil {

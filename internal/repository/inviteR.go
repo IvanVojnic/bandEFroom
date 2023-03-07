@@ -1,13 +1,15 @@
+// Package repository define invite repo methods
 package repository
 
 import (
 	"context"
 	"fmt"
-	"github.com/IvanVojnic/bandEFroom/models"
-	"github.com/jackc/pgx/v5"
 	"time"
 
+	"github.com/IvanVojnic/bandEFroom/models"
+
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -34,14 +36,17 @@ func NewInvitePostgres(db *pgxpool.Pool) *InvitePostgres {
 }
 
 // SendInvite used to send request to be a friends
-func (r *RoomPostgres) SendInvite(ctx context.Context, users *[]models.User, roomID uuid.UUID, creatorID uuid.UUID) error {
+func (r *RoomPostgres) SendInvite(ctx context.Context, users *[]models.User, roomID, creatorID uuid.UUID) error {
 	batch := &pgx.Batch{}
 	for _, user := range *users {
 		inviteID := uuid.New()
 		batch.Queue("INSERT INTO invites (id, user_id, room_id, status) VALUES($1, $2, $3, $4)", inviteID, user.ID, roomID, NoAnswer)
 	}
 	res := r.db.SendBatch(ctx, batch)
-	defer res.Close()
+	err := res.Close()
+	if err != nil {
+		return fmt.Errorf("error while inserting into invites: %s", err)
+	}
 	inviteID := uuid.New()
 	_, errInvite := r.db.Exec(ctx, "insert into invites (id, user_id, room_id, status) values($1, $2, $3, $4)",
 		inviteID, creatorID, roomID, Accept)
@@ -52,7 +57,7 @@ func (r *RoomPostgres) SendInvite(ctx context.Context, users *[]models.User, roo
 }
 
 // AcceptInvite used to accept invite to the room
-func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID) error {
+func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID, roomID uuid.UUID) error {
 	_, err := r.db.Exec(ctx,
 		`UPDATE invites 
 			SET status=$1 
@@ -65,7 +70,7 @@ func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID uuid.UUID, roomI
 }
 
 // DeclineInvite used to accept invite to the room
-func (r *RoomPostgres) DeclineInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID) error {
+func (r *RoomPostgres) DeclineInvite(ctx context.Context, userID, roomID uuid.UUID) error {
 	_, err := r.db.Exec(ctx,
 		`UPDATE invites 
 			SET status=$1 

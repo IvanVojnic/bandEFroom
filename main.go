@@ -1,19 +1,20 @@
+// Package main is a main package used to start the program
 package main
 
 import (
-	"github.com/IvanVojnic/bandEFroom/internal/service"
-	prUser "github.com/IvanVojnic/bandEFuser/proto"
-	"google.golang.org/grpc/credentials/insecure"
 	"net"
 	"os"
 
 	"github.com/IvanVojnic/bandEFroom/internal/config"
 	"github.com/IvanVojnic/bandEFroom/internal/repository"
 	"github.com/IvanVojnic/bandEFroom/internal/rpc"
+	"github.com/IvanVojnic/bandEFroom/internal/service"
 	pr "github.com/IvanVojnic/bandEFroom/proto"
+	prUser "github.com/IvanVojnic/bandEFuser/proto"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -52,11 +53,10 @@ func main() {
 
 	pr.RegisterRoomServer(s, inviteGRPC)
 	pr.RegisterRoomServer(s, roomGRPC)
-	listen, err := net.Listen("tcp", ":8000")
+	listen, err := net.Listen("tcp", "1.2.3.4:8000") // ???????????? ???????????? ????????????
 	if err != nil {
 		defer logrus.Fatalf("error while listening port: %e", err)
 	}
-
 	if errServ := s.Serve(listen); errServ != nil {
 		defer logrus.Fatalf("error while listening server: %e", err)
 	}

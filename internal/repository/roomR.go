@@ -1,10 +1,13 @@
+// Package repository define room repo methods
 package repository
 
 import (
 	"context"
 	"fmt"
+
 	"github.com/IvanVojnic/bandEFroom/models"
 	pr "github.com/IvanVojnic/bandEFuser/proto"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -42,6 +45,7 @@ func (r *RoomPostgres) GetRooms(ctx context.Context, userID uuid.UUID) (*[]model
 	return &rooms, nil
 }
 
+// GetRoomUsers used to get users from current room
 func (r *RoomPostgres) GetRoomUsers(ctx context.Context, roomID uuid.UUID) (*[]uuid.UUID, error) {
 	var usersID []uuid.UUID
 	rowsUserInvites, errUserInvites := r.db.Query(ctx,
@@ -63,9 +67,10 @@ func (r *RoomPostgres) GetRoomUsers(ctx context.Context, roomID uuid.UUID) (*[]u
 	return &usersID, nil
 }
 
+// GetUsers used to get full info of users from userMS
 func (r *RoomPostgres) GetUsers(ctx context.Context, usersID *[]uuid.UUID) (*[]models.User, error) {
-	var users []models.User
-	var usersIDStr []string
+	users := make([]models.User, 0)
+	usersIDStr := make([]string, 0)
 	for _, ID := range *usersID {
 		usersIDStr = append(usersIDStr, ID.String())
 	}

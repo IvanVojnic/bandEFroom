@@ -1,34 +1,40 @@
+// Package rpc define invite rpc methods
 package rpc
 
 import (
 	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"time"
 
+	"github.com/IvanVojnic/bandEFroom/models"
 	pr "github.com/IvanVojnic/bandEFroom/proto"
 
-	"github.com/IvanVojnic/bandEFroom/models"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 )
 
+// Invite is an interface with implemented methods from Invite service
 type Invite interface {
 	SendInvite(ctx context.Context, userCreatorID uuid.UUID, users *[]models.User, place string, date time.Time) error
-	AcceptInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID) error
-	DeclineInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID) error
+	AcceptInvite(ctx context.Context, userID, roomID uuid.UUID) error
+	DeclineInvite(ctx context.Context, userID, roomID uuid.UUID) error
 }
 
+// InviteServer used to define invite server obj
 type InviteServer struct {
 	pr.UnimplementedRoomServer
 	inviteServ Invite
 }
 
+// timeLayout define layout for date parsing
 const timeLayout = "2006-01-02 15:04:05"
 
+// NewInviteServer used to init invite serv obj
 func NewInviteServer(inviteServ Invite) *InviteServer {
 	return &InviteServer{inviteServ: inviteServ}
 }
 
+// SendInvite used to send invite by serv
 func (s *InviteServer) SendInvite(ctx context.Context, req *pr.SendInviteRequest) (*pr.SendInviteResponse, error) {
 	userCreatorID, errParse := uuid.Parse(req.GetUserCreatorID())
 	if errParse != nil {
@@ -65,7 +71,8 @@ func (s *InviteServer) SendInvite(ctx context.Context, req *pr.SendInviteRequest
 	return &pr.SendInviteResponse{}, nil
 }
 
-func (s *InviteServer) AcceptInvite(ctx context.Context, req *pr.AcceptInviteRequest) (*pr.AcceptInviteResponse, error) {
+// AcceptInvite used to accept invite by serv
+func (s *InviteServer) AcceptInvite(ctx context.Context, req *pr.AcceptInviteRequest) (*pr.AcceptInviteResponse, error) { // nolint:dupl, gocritic
 	userID, errUserParse := uuid.Parse(req.GetUserID())
 	if errUserParse != nil {
 		logrus.WithFields(logrus.Fields{
@@ -88,7 +95,8 @@ func (s *InviteServer) AcceptInvite(ctx context.Context, req *pr.AcceptInviteReq
 	return &pr.AcceptInviteResponse{}, nil
 }
 
-func (s *InviteServer) DeclineInvite(ctx context.Context, req *pr.DeclineInviteRequest) (*pr.DeclineInviteResponse, error) {
+// DeclineInvite used to decline invite by serv
+func (s *InviteServer) DeclineInvite(ctx context.Context, req *pr.DeclineInviteRequest) (*pr.DeclineInviteResponse, error) { // nolint:dupl, gocritic
 	userID, errUserParse := uuid.Parse(req.GetUserID())
 	if errUserParse != nil {
 		logrus.WithFields(logrus.Fields{

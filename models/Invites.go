@@ -1,10 +1,11 @@
+// Package models define Invite model
 package models
 
 import (
 	"github.com/google/uuid"
 )
 
-// Invite is a Invite
+// Invite is an InviteStruct
 type Invite struct {
 	ID     uuid.UUID `json:"id" db:"id"`
 	UserID uuid.UUID `json:"userID" db:"user_id"`
