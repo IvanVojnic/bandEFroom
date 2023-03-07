@@ -2,7 +2,10 @@ package main
 
 import (
 	"github.com/IvanVojnic/bandEFroom/internal/service"
+	prUser "github.com/IvanVojnic/bandEFuser/proto"
+	"google.golang.org/grpc/credentials/insecure"
 	"net"
+	"os"
 
 	"github.com/IvanVojnic/bandEFroom/internal/config"
 	"github.com/IvanVojnic/bandEFroom/internal/repository"
@@ -31,10 +34,19 @@ func main() {
 		}).Fatal("DB ERROR CONNECTION")
 	}
 	defer repository.ClosePool(db)
-	inviteRepo := repository.NewRoomPostgres(db)
-	roomRepo := repository.NewRoomPostgres(db)
+
+	connUserMS, err := grpc.Dial(os.Getenv("PORT"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logrus.Fatalf("error while conecting to user ms, %s", err)
+	}
+	clientUserComm := prUser.NewUserCommClient(connUserMS)
+
+	inviteRepo := repository.NewRoomPostgres(db, clientUserComm)
+	roomRepo := repository.NewRoomPostgres(db, clientUserComm)
+
 	inviteServ := service.NewInviteServer(inviteRepo)
 	roomServ := service.NewRoomServer(roomRepo)
+
 	inviteGRPC := rpc.NewInviteServer(inviteServ)
 	roomGRPC := rpc.NewRoomServer(roomServ)
 
