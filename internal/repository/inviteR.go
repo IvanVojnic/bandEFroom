@@ -34,9 +34,9 @@ func NewInvitePostgres(db *pgxpool.Pool) *InvitePostgres {
 }
 
 // SendInvite used to send request to be a friends
-func (r *RoomPostgres) SendInvite(ctx context.Context, users []models.User, roomID uuid.UUID, creatorID uuid.UUID) error {
+func (r *RoomPostgres) SendInvite(ctx context.Context, users *[]models.User, roomID uuid.UUID, creatorID uuid.UUID) error {
 	batch := &pgx.Batch{}
-	for _, user := range users {
+	for _, user := range *users {
 		inviteID := uuid.New()
 		batch.Queue("INSERT INTO invites (id, user_id, room_id, status) VALUES($1, $2, $3, $4)", inviteID, user.ID, roomID, NoAnswer)
 	}
@@ -52,12 +52,12 @@ func (r *RoomPostgres) SendInvite(ctx context.Context, users []models.User, room
 }
 
 // AcceptInvite used to accept invite to the room
-func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID, status int) error {
+func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID) error {
 	_, err := r.db.Exec(ctx,
 		`UPDATE invites 
 			SET status=$1 
 			WHERE invites.user_id=$2 AND invites.room_id=$3`,
-		status, userID, roomID)
+		Accept, userID, roomID)
 	if err != nil {
 		return fmt.Errorf("accpet invite error %w", err)
 	}
@@ -65,12 +65,12 @@ func (r *RoomPostgres) AcceptInvite(ctx context.Context, userID uuid.UUID, roomI
 }
 
 // DeclineInvite used to accept invite to the room
-func (r *RoomPostgres) DeclineInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID, status int) error {
+func (r *RoomPostgres) DeclineInvite(ctx context.Context, userID uuid.UUID, roomID uuid.UUID) error {
 	_, err := r.db.Exec(ctx,
 		`UPDATE invites 
 			SET status=$1 
 			WHERE invites.user_id=$2 AND invites.room_id=$3`,
-		status, userID, roomID)
+		Decline, userID, roomID)
 	if err != nil {
 		return fmt.Errorf("accpet invite error %w", err)
 	}

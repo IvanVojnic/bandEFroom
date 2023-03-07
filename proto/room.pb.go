@@ -410,9 +410,9 @@ var file_proto_room_proto_depIdxs = []int32{
 	2, // 0: room.GetRoomsResponse.rooms:type_name -> room.Room
 	5, // 1: room.GetUsersRoomResponse.users:type_name -> room.User
 	0, // 2: room.room.GetRooms:input_type -> room.GetRoomsRequest
-	3, // 3: room.room.GetUsersRoom:input_type -> room.GetUsersRoomRequest
+	3, // 3: room.room.GetRoomsUser:input_type -> room.GetUsersRoomRequest
 	1, // 4: room.room.GetRooms:output_type -> room.GetRoomsResponse
-	4, // 5: room.room.GetUsersRoom:output_type -> room.GetUsersRoomResponse
+	4, // 5: room.room.GetRoomsUser:output_type -> room.GetUsersRoomResponse
 	4, // [4:6] is the sub-list for method output_type
 	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

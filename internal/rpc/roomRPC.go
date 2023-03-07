@@ -11,8 +11,8 @@ import (
 )
 
 type Room interface {
-	GetRooms(ctx context.Context, user uuid.UUID) ([]models.Room, error)
-	GetUsersRoom(ctx context.Context, roomID uuid.UUID) ([]models.User, error)
+	GetRooms(ctx context.Context, user uuid.UUID) (*[]models.Room, error)
+	GetRoomsUser(ctx context.Context, roomID uuid.UUID) (*[]models.User, error)
 }
 
 type RoomServer struct {
@@ -28,16 +28,14 @@ func (s *RoomServer) GetRooms(ctx context.Context, req *pr.GetRoomsRequest) (*pr
 	userID, errUserParse := uuid.Parse(req.GetUserID())
 	if errUserParse != nil {
 		logrus.WithFields(logrus.Fields{
-			"Error parse user ID": errUserParse,
-			"userID":              userID,
-		}).Errorf("error parsing ID, %s", errUserParse)
+			"userID": userID,
+		}).Errorf("error parsing ID (get rooms), %s", errUserParse)
 		return &pr.GetRoomsResponse{}, fmt.Errorf("error while parsing ID, %s", errUserParse)
 	}
 	rooms, errGetRooms := s.roomServ.GetRooms(ctx, userID)
 	if errGetRooms != nil {
 		logrus.WithFields(logrus.Fields{
-			"Error get rooms": errGetRooms,
-			"rooms":           rooms,
+			"rooms": rooms,
 		}).Errorf("error get rooms, %s", errGetRooms)
 		return &pr.GetRoomsResponse{}, fmt.Errorf("error while get rooms, %s", errGetRooms)
 	}
@@ -48,21 +46,19 @@ func (s *RoomServer) GetUsersRoom(ctx context.Context, req *pr.GetUsersRoomReque
 	roomID, errRoomParse := uuid.Parse(req.GetRoomID())
 	if errRoomParse != nil {
 		logrus.WithFields(logrus.Fields{
-			"Error parse room ID": errRoomParse,
-			"userID":              roomID,
-		}).Errorf("error parsing ID, %s", errRoomParse)
+			"userID": roomID,
+		}).Errorf("error parsing ID (GetUsersRoom), %s", errRoomParse)
 		return &pr.GetUsersRoomResponse{}, fmt.Errorf("error while parsing ID, %s", errRoomParse)
 	}
-	users, errGetUsers := s.roomServ.GetUsersRoom(ctx, roomID)
+	users, errGetUsers := s.roomServ.GetRoomsUser(ctx, roomID)
 	if errGetUsers != nil {
 		logrus.WithFields(logrus.Fields{
-			"Error get users from room": errGetUsers,
-			"users":                     users,
+			"users": users,
 		}).Errorf("error get users from room, %s", errGetUsers)
 		return &pr.GetUsersRoomResponse{}, fmt.Errorf("error while getting users from room, %s", errGetUsers)
 	}
 	var usersGRPC []*pr.User
-	for _, user := range users {
+	for _, user := range *users {
 		usersGRPC = append(usersGRPC, &pr.User{ID: user.ID.String(), Name: user.Name, Email: user.Email})
 	}
 	return &pr.GetUsersRoomResponse{Users: usersGRPC}, nil
