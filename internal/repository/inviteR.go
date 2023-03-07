@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/IvanVojnic/bandEFroom/models"
+	"github.com/jackc/pgx/v5"
 	"time"
 
 	"github.com/google/uuid"
@@ -34,14 +35,13 @@ func NewInvitePostgres(db *pgxpool.Pool) *InvitePostgres {
 
 // SendInvite used to send request to be a friends
 func (r *RoomPostgres) SendInvite(ctx context.Context, users []models.User, roomID uuid.UUID, creatorID uuid.UUID) error {
-	for i := 0; i < len(users); i++ {
+	batch := &pgx.Batch{}
+	for _, user := range users {
 		inviteID := uuid.New()
-		_, errInvite := r.db.Exec(ctx, "insert into invites (id, user_id, room_id, status) values($1, $2, $3, $4)",
-			inviteID, users[i].ID, roomID, NoAnswer)
-		if errInvite != nil {
-			return fmt.Errorf("error while invite creating: %s", errInvite)
-		}
+		batch.Queue("INSERT INTO invites (id, user_id, room_id, status) VALUES($1, $2, $3, $4)", inviteID, user.ID, roomID, NoAnswer)
 	}
+	res := r.db.SendBatch(ctx, batch)
+	defer res.Close()
 	inviteID := uuid.New()
 	_, errInvite := r.db.Exec(ctx, "insert into invites (id, user_id, room_id, status) values($1, $2, $3, $4)",
 		inviteID, creatorID, roomID, Accept)
