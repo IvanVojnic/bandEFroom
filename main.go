@@ -1,16 +1,20 @@
+// Package main is a main package used to start the program
 package main
 
 import (
-	"github.com/IvanVojnic/bandEFroom/internal/service"
 	"net"
+	"os"
 
 	"github.com/IvanVojnic/bandEFroom/internal/config"
 	"github.com/IvanVojnic/bandEFroom/internal/repository"
 	"github.com/IvanVojnic/bandEFroom/internal/rpc"
+	"github.com/IvanVojnic/bandEFroom/internal/service"
 	pr "github.com/IvanVojnic/bandEFroom/proto"
+	prUser "github.com/IvanVojnic/bandEFuser/proto"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
@@ -26,26 +30,32 @@ func main() {
 	}
 	db, err := repository.NewPostgresDB(cfg)
 	if err != nil {
-		logrus.WithFields(logrus.Fields{
-			"Error connection to database rep.NewPostgresDB()": err,
-		}).Fatal("DB ERROR CONNECTION")
+		logrus.Fatalf("DB ERROR CONNECTION %s", err)
 	}
 	defer repository.ClosePool(db)
-	inviteRepo := repository.NewRoomPostgres(db)
-	roomRepo := repository.NewRoomPostgres(db)
+
+	connUserMS, err := grpc.Dial(os.Getenv("PORT"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logrus.Fatalf("error while conecting to user ms, %s", err)
+	}
+	clientUserComm := prUser.NewUserCommClient(connUserMS)
+
+	inviteRepo := repository.NewInvitePostgres(db)
+	roomRepo := repository.NewRoomPostgres(db, clientUserComm)
+
 	inviteServ := service.NewInviteServer(inviteRepo)
 	roomServ := service.NewRoomServer(roomRepo)
+
 	inviteGRPC := rpc.NewInviteServer(inviteServ)
 	roomGRPC := rpc.NewRoomServer(roomServ)
 
-	pr.RegisterRoomServer(s, inviteGRPC)
+	pr.RegisterInviteServer(s, inviteGRPC)
 	pr.RegisterRoomServer(s, roomGRPC)
-	listen, err := net.Listen("tcp", ":8000")
+	listen, err := net.Listen("tcp", "1.2.3.4:8000") // ???????????? ???????????? ????????????
 	if err != nil {
-		defer logrus.Fatalf("error while listening port: %e", err)
+		defer logrus.Errorf("error while listening port: %e", err)
 	}
-
 	if errServ := s.Serve(listen); errServ != nil {
-		defer logrus.Fatalf("error while listening server: %e", err)
+		defer logrus.Errorf("error while listening server: %e", err)
 	}
 }

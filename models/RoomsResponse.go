@@ -1,8 +1,10 @@
+// Package models define RoomResponse model
 package models
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // RoomResponse is a RoomResponse

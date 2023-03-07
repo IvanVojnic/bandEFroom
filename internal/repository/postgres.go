@@ -1,3 +1,4 @@
+// Package repository define pgx database connection
 package repository
 
 import (

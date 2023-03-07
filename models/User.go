@@ -1,3 +1,4 @@
+// Package models define User model
 package models
 
 import "github.com/google/uuid"

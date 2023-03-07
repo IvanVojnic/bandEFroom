@@ -24,7 +24,6 @@ message SendInviteResponse {
 message AcceptInviteRequest {
   string userID = 1;
   string roomID = 2;
-  int32 statusID = 3;
 }
 
 message AcceptInviteResponse {
@@ -34,7 +33,6 @@ message AcceptInviteResponse {
 message DeclineInviteRequest {
   string userID = 1;
   string roomID = 2;
-  int32 statusID = 3;
 }
 
 message DeclineInviteResponse {

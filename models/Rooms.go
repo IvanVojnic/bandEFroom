@@ -1,8 +1,10 @@
+// Package models define Room model
 package models
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // Room is a Room

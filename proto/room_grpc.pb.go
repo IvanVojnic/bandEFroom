@@ -45,7 +45,7 @@ func (c *roomClient) GetRooms(ctx context.Context, in *GetRoomsRequest, opts ...
 
 func (c *roomClient) GetUsersRoom(ctx context.Context, in *GetUsersRoomRequest, opts ...grpc.CallOption) (*GetUsersRoomResponse, error) {
 	out := new(GetUsersRoomResponse)
-	err := c.cc.Invoke(ctx, "/room.room/GetUsersRoom", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/room.room/GetRoomsUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (UnimplementedRoomServer) GetRooms(context.Context, *GetRoomsRequest) (*Get
 	return nil, status.Errorf(codes.Unimplemented, "method GetRooms not implemented")
 }
 func (UnimplementedRoomServer) GetUsersRoom(context.Context, *GetUsersRoomRequest) (*GetUsersRoomResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUsersRoom not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method GetRoomsUser not implemented")
 }
 func (UnimplementedRoomServer) mustEmbedUnimplementedRoomServer() {}
 
@@ -112,7 +112,7 @@ func _Room_GetUsersRoom_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/room.room/GetUsersRoom",
+		FullMethod: "/room.room/GetRoomsUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RoomServer).GetUsersRoom(ctx, req.(*GetUsersRoomRequest))
@@ -132,7 +132,7 @@ var Room_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Room_GetRooms_Handler,
 		},
 		{
-			MethodName: "GetUsersRoom",
+			MethodName: "GetRoomsUser",
 			Handler:    _Room_GetUsersRoom_Handler,
 		},
 	},
