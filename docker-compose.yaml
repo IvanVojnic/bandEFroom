@@ -31,7 +31,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: vojnic/user:userMs
+    image: vojnic/room:roomMs
     depends_on:
       - postgres
       - flyway
@@ -42,7 +42,7 @@ services:
   appcmd:
     image: vojnic/bandef:cmdMS
     ports:
-      - "3000:40000"
+      - "4000:40000"
     environment:
       - PORT=app:9000
     networks:
