@@ -1,7 +1,7 @@
 github.com/IvanVojnic/bandEFnotif v1.0.4 h1:ka7lEFCchM3qCyvBbwz6ZXEf1/OqQb/8gnoW4UlhKAI=
 github.com/IvanVojnic/bandEFnotif v1.0.4/go.mod h1:GUQ6SmsMiK6NeEkPqPPtPQP/hxxnvIM90ET+YZHjAo4=
-github.com/IvanVojnic/bandEFuser v1.0.3 h1:YdyXzNztvnuV0mTNqAd1BYO4bmwxWPSiaqU3Gef2vqc=
-github.com/IvanVojnic/bandEFuser v1.0.3/go.mod h1:5R43CQDhNFw4D3VjBHl7O4YhLh8Su1pmOtjkdOWexpY=
+github.com/IvanVojnic/bandEFuser v1.0.4 h1:QPvqMX6FTU0TML0wjE/DXlOsBlxwgeA5jw8087OLwxk=
+github.com/IvanVojnic/bandEFuser v1.0.4/go.mod h1:NXC2SOtql6y/kcnmDyVd4LG8mR3JF6TVMOfoRAJMqMI=
 github.com/caarlos0/env/v7 v7.1.0 h1:9lzTF5amyQeWHZzuZeKlCb5FWSUxpG1js43mhbY8ozg=
 github.com/caarlos0/env/v7 v7.1.0/go.mod h1:LPPWniDUq4JaO6Q41vtlyikhMknqymCLBw0eX4dcH1E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -32,8 +32,8 @@ github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.8.2 h1:+h33VjcLVPDHtOdpUCuF+7gSuG3yGIftsP1YvFihtJ8=
 golang.org/x/crypto v0.6.0 h1:qfktjS5LUO+fFKeJXZ+ikTRijMmljikvG68fpMMruSc=
 golang.org/x/crypto v0.6.0/go.mod h1:OFC/31mSvZgRz0V1QTNCzfAI1aIRzbiufJtkMIlEp58=
-golang.org/x/net v0.6.0 h1:L4ZwwTvKW9gr0ZMS1yrHD9GZhIuVjOBBnaKH+SPQK0Q=
-golang.org/x/net v0.6.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
+golang.org/x/net v0.7.0 h1:rJrUqqhjsgNp7KqAIc25s9pZnjU7TUcSY7HcVZjdn1g=
+golang.org/x/net v0.7.0/go.mod h1:2Tu9+aMcznHK/AK1HMvgo6xiTLG5rD5rZLDS+rp2Bjs=
 golang.org/x/sync v0.1.0 h1:wsuoTGHzEhffawBOhz5CYhcrV4IdKZbEyZjBMuTp12o=
 golang.org/x/sync v0.1.0/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

@@ -50,10 +50,10 @@ func (r *UserPostgres) GetUser(ctx context.Context, userID uuid.UUID) (models.Us
 	if errGRPC != nil {
 		return models.User{}, fmt.Errorf("error while sign up, %s", errGRPC)
 	}
-	userID, errUserID := uuid.Parse(res.ID)
+	userID, errUserID := uuid.Parse(res.User.ID)
 	if errUserID != nil {
 		return models.User{}, fmt.Errorf("error while parsing room ID, %s", errUserID)
 	}
-	user := models.User{ID: userID, Name: res.Name, Email: res.Email}
+	user := models.User{ID: userID, Name: res.User.Name, Email: res.User.Email}
 	return user, nil
 }
