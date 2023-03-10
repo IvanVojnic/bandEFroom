@@ -6,9 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/IvanVojnic/bandEFroom/models"
-
-	prNotif "github.com/IvanVojnic/bandEFnotif/proto"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -16,8 +13,7 @@ import (
 
 // InvitePostgres is a wrapper to db object
 type InvitePostgres struct {
-	db     *pgxpool.Pool
-	client prNotif.InviteRoomClient
+	db *pgxpool.Pool
 }
 
 // Status used to define types of statuses
@@ -38,12 +34,12 @@ func NewInvitePostgres(db *pgxpool.Pool) *InvitePostgres {
 }
 
 // SendInvite used to send request to be a friends
-func (r *InvitePostgres) SendInvite(ctx context.Context, users []*models.User, roomID, creatorID uuid.UUID) error {
+func (r *InvitePostgres) SendInvite(ctx context.Context, usersID []*uuid.UUID, roomID, creatorID uuid.UUID) error {
 	batch := &pgx.Batch{}
 	var inviteID uuid.UUID
-	for _, user := range users {
+	for _, userID := range usersID {
 		inviteID = uuid.New()
-		batch.Queue("INSERT INTO invites (id, user_id, room_id, status) VALUES($1, $2, $3, $4)", inviteID, user.ID, roomID, NoAnswer)
+		batch.Queue("INSERT INTO invites (id, user_id, room_id, status) VALUES($1, $2, $3, $4)", inviteID, userID, roomID, NoAnswer)
 	}
 	inviteID = uuid.New()
 	batch.Queue("INSERT INTO invites (id, user_id, room_id, status) VALUES($1, $2, $3, $4)", inviteID, creatorID, roomID, Accept)
@@ -90,12 +86,4 @@ func (r *InvitePostgres) CreateRoom(ctx context.Context, userID uuid.UUID, place
 		return uuid.UUID{}, fmt.Errorf("error while room creating: %s", errRoom)
 	}
 	return roomID, nil
-}
-
-func (r *InvitePostgres) StorageInvite(ctx context.Context, userCreatorID uuid.UUID, roomID uuid.UUID, date time.Time, place string) error {
-	_, errGRPC := r.client.StorageInvite(ctx, &prNotif.StorageInviteRequest{UserCreatorID: userCreatorID.String(), RoomID: roomID.String(), Place: place, Date: date.String()})
-	if errGRPC != nil {
-		return fmt.Errorf("error while storage notiffications of invite, %s", errGRPC)
-	}
-	return nil
 }

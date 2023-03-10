@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/IvanVojnic/bandEFroom/models"
-	pr "github.com/IvanVojnic/bandEFuser/proto"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -14,13 +13,12 @@ import (
 
 // RoomPostgres is a wrapper to db object
 type RoomPostgres struct {
-	db     *pgxpool.Pool
-	client pr.UserCommClient
+	db *pgxpool.Pool
 }
 
 // NewRoomPostgres used to init RoomPostgres
-func NewRoomPostgres(db *pgxpool.Pool, client pr.UserCommClient) *RoomPostgres {
-	return &RoomPostgres{db: db, client: client}
+func NewRoomPostgres(db *pgxpool.Pool) *RoomPostgres {
+	return &RoomPostgres{db: db}
 }
 
 // GetRooms used to get rooms where you had invited
@@ -65,27 +63,4 @@ func (r *RoomPostgres) GetRoomUsers(ctx context.Context, roomID uuid.UUID) ([]*u
 		usersID = append(usersID, &userID)
 	}
 	return usersID, nil
-}
-
-// GetUsers used to get full info of users from userMS
-func (r *RoomPostgres) GetUsers(ctx context.Context, usersID []*uuid.UUID) ([]*models.User, error) {
-	users := make([]*models.User, 0)
-	usersIDStr := make([]string, 0)
-	for _, ID := range usersID {
-		usersIDStr = append(usersIDStr, ID.String())
-	}
-
-	res, errGRPC := r.client.GetUsers(ctx, &pr.GetUsersRequest{UsersID: usersIDStr})
-	if errGRPC != nil {
-		return users, fmt.Errorf("error while sign up, %s", errGRPC)
-	}
-
-	for _, user := range res.Users {
-		userID, errUserID := uuid.Parse(user.ID)
-		if errUserID != nil {
-			return users, fmt.Errorf("error while parsing room ID, %s", errUserID)
-		}
-		users = append(users, &models.User{ID: userID, Name: user.Name, Email: user.Email})
-	}
-	return users, nil
 }

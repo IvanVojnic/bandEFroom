@@ -14,12 +14,17 @@ import (
 type Room interface {
 	GetRooms(ctx context.Context, user uuid.UUID) ([]*models.Room, error)
 	GetRoomUsers(ctx context.Context, roomID uuid.UUID) ([]*uuid.UUID, error)
+}
+
+type User interface {
 	GetUsers(ctx context.Context, usersID []*uuid.UUID) ([]*models.User, error)
+	GetUser(ctx context.Context, userID uuid.UUID) (models.User, error)
 }
 
 // RoomServer define service invites
 type RoomServer struct {
 	roomRepo Room
+	userRepo User
 }
 
 // NewRoomServer used to init service user communicate struct
@@ -38,7 +43,7 @@ func (s *RoomServer) GetRoomsUser(ctx context.Context, roomID uuid.UUID) ([]*mod
 	if errUsersID != nil {
 		return nil, fmt.Errorf("get rooms user service lay, %s", errUsersID)
 	}
-	users, err := s.roomRepo.GetUsers(ctx, usersID) // get all users by they id from userMS
+	users, err := s.userRepo.GetUsers(ctx, usersID) // get all users by they id from userMS
 	if err != nil {
 		return nil, fmt.Errorf("get users for current room service lay, %s", err)
 	}
