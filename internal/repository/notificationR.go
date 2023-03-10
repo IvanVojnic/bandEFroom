@@ -27,7 +27,7 @@ func (r *NotificationMS) StorageInvite(ctx context.Context, userCreator models.U
 	for _, userInvited := range usersInvited {
 		usersInvitedGRPC = append(usersInvitedGRPC, &prNotif.User{UserID: userInvited.ID.String(), UserName: userInvited.Name, UserEmail: userInvited.Email})
 	}
-	_, errGRPC := r.client.StorageInvite(ctx, &prNotif.StorageInviteRequest{UserCreator: userCreatorGRPC, UsersInvited: usersInvitedGRPC, RoomID: roomID.String(), Place: place, Date: date.String()})
+	_, errGRPC := r.client.StorageInvite(ctx, &prNotif.StorageInviteRequest{UserCreator: userCreatorGRPC, Users: usersInvitedGRPC, RoomID: roomID.String(), Place: place, Date: date.String()})
 	if errGRPC != nil {
 		return fmt.Errorf("error while storage notiffications of invite, %s", errGRPC)
 	}

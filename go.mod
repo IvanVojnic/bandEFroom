@@ -3,9 +3,9 @@ module github.com/IvanVojnic/bandEFroom
 go 1.19
 
 require (
-	github.com/IvanVojnic/bandEFnotif v1.0.1
+	github.com/IvanVojnic/bandEFnotif v1.0.4
 	github.com/IvanVojnic/bandEFuser v1.0.3
-	github.com/caarlos0/env/v7 v7.0.0
+	github.com/caarlos0/env/v7 v7.1.0
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v5 v5.3.1
 	github.com/sirupsen/logrus v1.9.0

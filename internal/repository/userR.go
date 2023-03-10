@@ -54,6 +54,6 @@ func (r *UserPostgres) GetUser(ctx context.Context, userID uuid.UUID) (models.Us
 	if errUserID != nil {
 		return models.User{}, fmt.Errorf("error while parsing room ID, %s", errUserID)
 	}
-	user := models.User{ID: userID, Name: res.Name, Email: res.Email})
+	user := models.User{ID: userID, Name: res.Name, Email: res.Email}
 	return user, nil
 }
