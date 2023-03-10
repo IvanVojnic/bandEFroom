@@ -8,6 +8,7 @@ import (
 
 	"github.com/IvanVojnic/bandEFroom/models"
 
+	prNotif "github.com/IvanVojnic/bandEFnotif/proto"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -15,7 +16,8 @@ import (
 
 // InvitePostgres is a wrapper to db object
 type InvitePostgres struct {
-	db *pgxpool.Pool
+	db     *pgxpool.Pool
+	client prNotif.InviteRoomClient
 }
 
 // Status used to define types of statuses
@@ -88,4 +90,12 @@ func (r *InvitePostgres) CreateRoom(ctx context.Context, userID uuid.UUID, place
 		return uuid.UUID{}, fmt.Errorf("error while room creating: %s", errRoom)
 	}
 	return roomID, nil
+}
+
+func (r *InvitePostgres) StorageInvite(ctx context.Context, userCreatorID uuid.UUID, roomID uuid.UUID, date time.Time, place string) error {
+	_, errGRPC := r.client.StorageInvite(ctx, &prNotif.StorageInviteRequest{UserCreatorID: userCreatorID.String(), RoomID: roomID.String(), Place: place, Date: date.String()})
+	if errGRPC != nil {
+		return fmt.Errorf("error while storage notiffications of invite, %s", errGRPC)
+	}
+	return nil
 }

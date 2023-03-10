@@ -4,7 +4,6 @@ package service
 import (
 	"context"
 	"fmt"
-	prNotif "github.com/IvanVojnic/bandEFnotif/proto"
 	"time"
 
 	"github.com/IvanVojnic/bandEFroom/models"
@@ -18,12 +17,12 @@ type Invite interface {
 	AcceptInvite(ctx context.Context, userID, roomID uuid.UUID) error
 	DeclineInvite(ctx context.Context, userID, roomID uuid.UUID) error
 	CreateRoom(ctx context.Context, userCreatorID uuid.UUID, place string, date time.Time) (uuid.UUID, error)
+	StorageInvite(ctx context.Context, userCreatorID uuid.UUID, roomID uuid.UUID, date time.Time, place string) error
 }
 
 // InviteServer define service invites
 type InviteServer struct {
 	inviteRepo Invite
-	client     prNotif.NotifClient
 }
 
 // NewInviteServer used to init service user communicate struct
@@ -41,11 +40,7 @@ func (s *InviteServer) SendInvite(ctx context.Context, userCreatorID uuid.UUID, 
 	if err != nil {
 		fmt.Errorf("error while creating invites, %s", err)
 	}
-	_, errGRPC := s.client.StorageInviteRequest(ctx, &prNotif.StorageInviteRequest{UserCreatorID: userCreatorID.String(), RoomID: roomID.String(), Place: place, Date: date.String()})
-	if errGRPC != nil {
-		return fmt.Errorf("error while storage notiffications of invite, %s", errGRPC)
-	}
-	return nil
+	return s.inviteRepo.StorageInvite(ctx, userCreatorID, roomID, date, place)
 }
 
 // AcceptInvite used to accept invite to the room by repo
