@@ -11,18 +11,18 @@ import (
 	"github.com/google/uuid"
 )
 
-// UserPostgres is a wrapper to db object
-type UserPostgres struct {
+// UserMS is a wrapper to db object
+type UserMS struct {
 	client pr.UserCommClient
 }
 
-// NewUserPostgres used to init UserPostgres
-func NewUserPostgres(client pr.UserCommClient) *UserPostgres {
-	return &UserPostgres{client: client}
+// NewUserMS used to init UserMS
+func NewUserMS(client pr.UserCommClient) *UserMS {
+	return &UserMS{client: client}
 }
 
 // GetUsers used to get full info of users from userMS
-func (r *UserPostgres) GetUsers(ctx context.Context, usersID []*uuid.UUID) ([]*models.User, error) {
+func (r *UserMS) GetUsers(ctx context.Context, usersID []*uuid.UUID) ([]*models.User, error) {
 	users := make([]*models.User, 0)
 	usersIDStr := make([]string, 0)
 	for _, ID := range usersID {
@@ -45,7 +45,7 @@ func (r *UserPostgres) GetUsers(ctx context.Context, usersID []*uuid.UUID) ([]*m
 }
 
 // GetUser used to get full info of users from userMS
-func (r *UserPostgres) GetUser(ctx context.Context, userID uuid.UUID) (models.User, error) {
+func (r *UserMS) GetUser(ctx context.Context, userID uuid.UUID) (models.User, error) {
 	res, errGRPC := r.client.GetUser(ctx, &pr.GetUserRequest{UserID: userID.String()})
 	if errGRPC != nil {
 		return models.User{}, fmt.Errorf("error while sign up, %s", errGRPC)

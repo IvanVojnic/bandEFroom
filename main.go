@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 
+	prNotif "github.com/IvanVojnic/bandEFnotif/proto"
 	"github.com/IvanVojnic/bandEFroom/internal/config"
 	"github.com/IvanVojnic/bandEFroom/internal/repository"
 	"github.com/IvanVojnic/bandEFroom/internal/rpc"
@@ -40,10 +41,18 @@ func main() {
 	}
 	clientUserComm := prUser.NewUserCommClient(connUserMS)
 
-	inviteRepo := repository.NewInvitePostgres(db)
-	roomRepo := repository.NewRoomPostgres(db, clientUserComm)
+	connNotifMS, err := grpc.Dial(os.Getenv("PORT"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logrus.Fatalf("error while conecting to notif ms, %s", err)
+	}
+	clientNotifComm := prNotif.NewInviteRoomClient(connNotifMS)
 
-	inviteServ := service.NewInviteServer(inviteRepo)
+	inviteRepo := repository.NewInvitePostgres(db)
+	roomRepo := repository.NewRoomPostgres(db)
+	userRepo := repository.NewUserMS(clientUserComm)
+	notifRepo := repository.NewNotificationMS(clientNotifComm)
+
+	inviteServ := service.NewInviteServer(inviteRepo, userRepo, notifRepo)
 	roomServ := service.NewRoomServer(roomRepo)
 
 	inviteGRPC := rpc.NewInviteServer(inviteServ)
@@ -51,7 +60,7 @@ func main() {
 
 	pr.RegisterInviteServer(s, inviteGRPC)
 	pr.RegisterRoomServer(s, roomGRPC)
-	listen, err := net.Listen("tcp", "1.2.3.4:8000") // ???????????? ???????????? ????????????
+	listen, err := net.Listen("tcp", "0.0.0.0:8000") // ???????????? ???????????? ????????????
 	if err != nil {
 		defer logrus.Errorf("error while listening port: %e", err)
 	}
