@@ -2,9 +2,6 @@
 package main
 
 import (
-	"net"
-	"os"
-
 	prNotif "github.com/IvanVojnic/bandEFnotif/proto"
 	"github.com/IvanVojnic/bandEFroom/internal/config"
 	"github.com/IvanVojnic/bandEFroom/internal/repository"
@@ -12,6 +9,7 @@ import (
 	"github.com/IvanVojnic/bandEFroom/internal/service"
 	pr "github.com/IvanVojnic/bandEFroom/proto"
 	prUser "github.com/IvanVojnic/bandEFuser/proto"
+	"net"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -34,14 +32,14 @@ func main() {
 		logrus.Fatalf("DB ERROR CONNECTION %s", err)
 	}
 	defer repository.ClosePool(db)
-
-	connUserMS, err := grpc.Dial(os.Getenv("PORT"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	logrus.Info("room1")
+	connUserMS, err := grpc.Dial("app:8000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logrus.Fatalf("error while conecting to user ms, %s", err)
 	}
 	clientUserComm := prUser.NewUserCommClient(connUserMS)
-
-	connNotifMS, err := grpc.Dial(os.Getenv("PORT"), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	logrus.Info("room2")
+	connNotifMS, err := grpc.Dial("app:10000", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logrus.Fatalf("error while conecting to notif ms, %s", err)
 	}
@@ -57,10 +55,10 @@ func main() {
 
 	inviteGRPC := rpc.NewInviteServer(inviteServ)
 	roomGRPC := rpc.NewRoomServer(roomServ)
-
+	logrus.Info("room3")
 	pr.RegisterInviteServer(s, inviteGRPC)
 	pr.RegisterRoomServer(s, roomGRPC)
-	listen, err := net.Listen("tcp", "0.0.0.0:8000") // ???????????? ???????????? ????????????
+	listen, err := net.Listen("tcp", "0.0.0.0:9000") // ???????????? ???????????? ????????????
 	if err != nil {
 		defer logrus.Errorf("error while listening port: %e", err)
 	}

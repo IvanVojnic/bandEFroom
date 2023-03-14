@@ -13,7 +13,7 @@ services:
       timeout: 5s
       retries: 5
     ports:
-      - "5432:5432"
+      - "5234:5432"
     networks:
       - default
   flyway:
@@ -27,7 +27,7 @@ services:
       - postgres
     networks:
       - default
-  app:
+  approom:
     container_name: room
     build:
       context: .
@@ -38,5 +38,19 @@ services:
       - flyway
     environment:
       - pUrl=postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable
+    ports:
+      - "9000:9000"
+    external_links:
+      - user:user
+      - cmd:cmd
     networks:
       - default
+      - appcmd_default
+      - app_default
+networks:
+  default:
+    driver: bridge
+  appcmd_default:
+    external: true
+  app_default:
+    external: true

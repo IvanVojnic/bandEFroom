@@ -35,6 +35,7 @@ func NewInviteServer(inviteServ Invite) *InviteServer {
 
 // SendInvite used to send invite by serv
 func (s *InviteServer) SendInvite(ctx context.Context, req *pr.SendInviteRequest) (*pr.SendInviteResponse, error) {
+	logrus.Info("roomSI1")
 	userCreatorID, errParse := uuid.Parse(req.GetUserCreatorID())
 	if errParse != nil {
 		logrus.WithFields(logrus.Fields{
@@ -42,6 +43,7 @@ func (s *InviteServer) SendInvite(ctx context.Context, req *pr.SendInviteRequest
 		}).Errorf("error parsing ID (send invite), %s", errParse)
 		return &pr.SendInviteResponse{}, fmt.Errorf("error while parsing ID, %s", errParse)
 	}
+	logrus.Info("roomSI2")
 	usersID := make([]*uuid.UUID, len(req.GetUsersID()))
 	for _, userGRPC := range req.GetUsersID() {
 		userID, errParseID := uuid.Parse(userGRPC)
@@ -52,20 +54,25 @@ func (s *InviteServer) SendInvite(ctx context.Context, req *pr.SendInviteRequest
 			}).Errorf("error parsing ID (send invite), %s", errParseID)
 			return &pr.SendInviteResponse{}, fmt.Errorf("error while parsing ID, %s", errParseID)
 		}
+		logrus.Info("roomSI3")
 		usersID = append(usersID, &userID)
 	}
 	date, errDateParse := time.Parse(timeLayout, req.GetDate())
+	logrus.Info("roomSI4")
 	if errDateParse != nil {
 		logrus.WithFields(logrus.Fields{
 			"date": date,
 		}).Errorf("error parsing date (send invite), %s", errDateParse)
 		return &pr.SendInviteResponse{}, fmt.Errorf("error while parsing date, %s", errDateParse)
 	}
+	logrus.Info("roomSI5")
 	errSend := s.inviteServ.SendInvite(ctx, userCreatorID, usersID, req.GetPlace(), date)
+	logrus.Info("roomSI6")
 	if errSend != nil {
 		logrus.Errorf("error sending invite, %s", errSend)
 		return &pr.SendInviteResponse{}, fmt.Errorf("error while seding invite, %s", errSend)
 	}
+	logrus.Info("roomSI7")
 	return &pr.SendInviteResponse{}, nil
 }
 
